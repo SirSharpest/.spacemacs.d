@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+#name : ipython
+#key : py
+#contributor : Nathan Hughes
+# --
+#+BEGIN_SRC ipython :session
+  $0
+#+END_SRC
