@@ -316,15 +316,14 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq ispell-program-name "/usr/local/bin/aspell")
 
   (add-hook 'text-mode-hook 'flyspell-mode)
-  (setq highlight-indent-guides-method 'character)
-  (defun my-prog-mode-hook ()
-    "Adds a few things to my prog hook"
-    (flyspell-prog-mode)
-    (rainbow-delimiters-mode)
-    (highlight-indent-guides-mode)
-    (symbol-overlay-mode)
-    (display-line-numbers-mode)
-    )
+  ;; (setq highlight-indent-guides-method 'character)
+  ;; (defun my-prog-mode-hook ()
+  ;;   "Adds a few things to my prog hook"
+  ;;   (flyspell-prog-mode)
+  ;;   ;;(rainbow-delimiters-mode)
+  ;;   ;;(symbol-overlay-mode)
+  ;;   ;;(display-line-numbers-mode)
+  ;;   )
 
   (add-hook 'prog-mode-hook 'my-prog-mode-hook)
 
@@ -354,14 +353,14 @@ you should place your code here."
 
 
   (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
-
-  ;; (custom-set-faces
-  ;;  '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
-  ;;  '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
-  ;;  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
-  ;;  '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
-  ;;  '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-  ;;  )
+   (setq org-export-babel-evaluate nil)
+  (custom-set-faces
+   '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
+   '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
+   '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
+   '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
+   '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
+   )
   
   ;;(pyvenv-workon "playground")
 
@@ -402,31 +401,6 @@ you should place your code here."
 
   (global-prettify-symbols-mode 1)
 
-
-  (add-hook
-   'python-mode-hook
-   (lambda ()
-     (mapc (lambda (pair) (push pair prettify-symbols-alist))
-           '(;; Syntax
-             ("def" .      #x1D41F)
-             ("in" .       #x2208)
-             ("not in" .   #x2209)
-             ("return" .   #x27fc)
-             ("yield" .    #x27fb)
-             ("for" .      #x2200)
-             ;; Base Types
-             ("int" .      #x2124)
-             ("float" .    #x211d)
-             ("str" .      #x1d54a)
-             ("True" .     #x1d54b)
-             ("False" .    #x1d53d)
-             ;; Mypy
-             ("Dict" .     #x1d507)
-             ("List" .     #x2112)
-             ("Tuple" .    #x2a02)
-             ("Set" .      #x2126)
-             ("Iterable" . #x1d50a)
-             ("Union" .    #x22c3)))))
 
   ;; Turn on languages for org mode
   (org-babel-do-load-languages
@@ -687,7 +661,8 @@ you should place your code here."
 
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
 
-
+(setq-default dotspacemacs-configuration-layers '(
+                                                  (python :variables python-enable-yapf-format-on-save t)))
 
   )
 
