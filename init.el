@@ -32,14 +32,11 @@ values."
    dotspacemacs-configuration-layers
    '(
      python
-     ;; ----------------------------------------------------------------
-     ;; Example of useful layers you may want to use right away.
-     ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
-     ;; <M-m f e R> (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
      helm
-     auto-completion
+     (auto-completion :variables
+                      auto-completion-enable-snippets-in-popup t)
      ;; better-defaults
+     latex
      osx
      themes-megapack
      emacs-lisp
@@ -63,8 +60,10 @@ values."
                                       swiper-helm
                                       multiple-cursors
                                       yasnippet-snippets
-                                      lispy)
-   ;; A list of packages that cannot be updated.x
+                                      lispy
+                                      langtool
+                                      ein)
+   ;; A list of packages that cannot be uspdated.x
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '()
@@ -104,37 +103,16 @@ values."
    ;; use different package directories for different Emacs versions, set this
    ;; to `emacs-version'.
    dotspacemacs-elpa-subdirectory nil
-   ;; One of `vim', `emacs' or `hybrid'.
-   ;; `hybrid' is like `vim' except that `insert state' is replaced by the
-   ;; `hybrid state' with `emacs' key bindings. The value can also be a list
-   ;; with `:variables' keyword (similar to layers). Check the editing styles
-   ;; section of the documentation for details on available variables.
-   ;; (default 'vim)
    dotspacemacs-editing-style 'emacs
-   ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading nil
-   ;; Specify the startup banner. Default value is `official', it displays
-   ;; the official spacemacs logo. An integer value is the index of text
-   ;; banner, `random' chooses a random text banner in `core/banners'
-   ;; directory. A string value must be a path to an image format supported
-   ;; by your Emacs build.
-   ;; If the value is nil then no banner is displayed. (default 'official)
    dotspacemacs-startup-banner 'official
-   ;; List of items to show in startup buffer or an association list of
-   ;; the form `(list-type . list-size)`. If nil then it is disabled.
-   ;; Possible values for list-type are:
    ;; `recents' `bookmarks' `projects' `agenda' `todos'."
-   ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
    dotspacemacs-startup-lists '((recents . 5)
                                 (projects . 7))
-   ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive t
    ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'text-mode
-   ;; List of themes, the first of the list is loaded when spacemacs starts.
-   ;; Press <SPC> T n to cycle to the next theme in the list (works great
-   ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(nord
                          spacemacs-dark
                          spacemacs-light)
@@ -149,26 +127,12 @@ values."
                                :powerline-scale 1.1)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
-   ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
-   ;; (default "SPC")
    dotspacemacs-emacs-command-key "SPC"
-   ;; The key used for Vim Ex commands (default ":")
    dotspacemacs-ex-command-key ":"
-   ;; The leader key accessible in `emacs state' and `insert state'
-   ;; (default "M-m")
    dotspacemacs-emacs-leader-key "M-m"
-   ;; Major mode leader key is a shortcut key which is the equivalent of
-   ;; pressing `<leader> m`. Set it to `nil` to disable it. (default ",")
    dotspacemacs-major-mode-leader-key ","
-   ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m")
    dotspacemacs-major-mode-emacs-leader-key "C-M-m"
    ;; These variables control whether separate commands are bound in the GUI to
-   ;; the key pairs C-i, TAB and C-m, RET.
-   ;; Setting it to a non-nil value, allows for separate commands under <C-i>
-   ;; and TAB or <C-m> and RET.
-   ;; In the terminal, these pairs are generally indistinguishable, so this only
-   ;; works in the GUI. (default nil)
    dotspacemacs-distinguish-gui-tab nil
    ;; If non nil `Y' is remapped to `y$' in Evil states. (default nil)
    dotspacemacs-remap-Y-to-y$ nil
@@ -318,6 +282,19 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (add-to-list 'load-path "~/.spacemacs.d/scimax//")
   )
 
+(add-hook 'company-mode-hook
+          (lambda ()
+            (substitute-key-definition
+             'company-complete-common
+             'company-yasnippet-or-completion
+             company-active-map)))
+
+
+
+
+
+
+
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
@@ -326,342 +303,24 @@ This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
-  (setenv "WORKON_HOME" "~/anaconda3/envs")
-  (pyvenv-workon "playground") ;; Default working env that has my libs
-
   (require 'ob-ipython)
   (require 'scimax-ob)
   (require 'scimax-org-babel-ipython-upstream)
 
-  (setq-default flycheck-disabled-checkers '(python-flake8))
-  (setq-default dotspacemacs-configuration-layers '(
-                                                    (python :variables python-enable-yapf-format-on-save t)))
+  (defun load-directory (dir)
+    (let ((load-it (lambda (f)
+                     (load-file (concat (file-name-as-directory dir) f)))
+                   ))
+      (mapc load-it (directory-files dir nil "\\.el$"))))
 
-  (eval-after-load "flyspell"
-    '(progn
-       (define-key flyspell-mode-map (kbd "C-.") nil)
-       (define-key flyspell-mode-map (kbd "C-,") nil)
-       ))
+  (load-directory "~/.spacemacs.d/configs/")
+  (setq yas-snippet-dirs '("~/.spacemacs.d/snippets/"))
 
-
-
-    (setq org-confirm-babel-evaluate nil)
-  (setq org-latex-listings 'minted
-        org-latex-packages-alist '(("" "minted"))
-        org-latex-pdf-process (quote ("latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f  %f --synctex=1")))
-
-
-  (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
-   (setq org-export-babel-evaluate nil)
-  (custom-set-faces
-   '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
-   '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
-   '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
-   '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
-   '(org-level-5 ((t (:inherit outline-5 :height 1.0))))
-   )
-  
-  ;;(pyvenv-workon "playground")
-
-  (global-set-key (kbd "C-f") 'helm-projectile)
-  (global-set-key (kbd "C-x b") 'helm-buffers-list)
-  (global-set-key (kbd "C-b") 'helm-buffers-list)
-  (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "C-x a") 'helm-for-files)
-  (global-set-key (kbd "M-x") 'helm-M-x)
-  (global-set-key (kbd "M-i") 'helm-imenu)
-  (global-set-key (kbd "C-s") 'swiper-helm)
-  (customize-set-variable 'helm-ff-lynx-style-map t)
-
-  (defun move-line-up ()
-    "Move up the current line."
-    (interactive)
-    (transpose-lines 1)
-    (forward-line -2)
-    (indent-according-to-mode))
-
-  (defun move-line-down ()
-    "Move down the current line."
-    (interactive)
-    (forward-line 1)
-    (transpose-lines 1)
-    (forward-line -1)
-    (indent-according-to-mode))
-
-  (global-set-key [M-up] 'move-line-up)
-  (global-set-key [M-down] 'move-line-down)
+  (setq ispell-dictionary "en_GB")
 
   (electric-pair-mode)
-  (require 'expand-region)
-  (global-set-key (kbd "C-=") 'er/expand-region)
-
-  ;; Heck truncation
   (set-default 'truncate-lines nil)
-
   (global-prettify-symbols-mode 1)
-
-
-  ;; Turn on languages for org mode
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((R . t)
-     (python . t)
-     (ipython . t)
-     (plantuml .t)
-     (latex . t)))
-
-
-
-;;; AUCTeX
-;; Customary Customization, p. 1 and 16 in the manual, and http://www.emacswiki.org/emacs/AUCTeX#toc2
-(setq TeX-parse-self t); Enable parse on load.
-(setq TeX-auto-save t); Enable parse on save.
-(setq-default TeX-master nil)
-
-(setq TeX-PDF-mode t); PDF mode (rather than DVI-mode)
-
-(add-hook 'TeX-mode-hook
-          (lambda () (TeX-fold-mode 1))); Automatically activate TeX-fold-mode.
-(setq LaTeX-babel-hyphen nil); Disable language-specific hyphen insertion.
-
-;; " expands into csquotes macros (for this to work babel must be loaded after csquotes).
-(setq LaTeX-csquotes-close-quote "}"
-      LaTeX-csquotes-open-quote "\\enquote{")
-
-;; LaTeX-math-mode http://www.gnu.org/s/auctex/manual/auctex/Mathematics.html
-(add-hook 'TeX-mode-hook 'LaTeX-math-mode)
-
-;;; RefTeX
-;; Turn on RefTeX for AUCTeX http://www.gnu.org/s/auctex/manual/reftex/reftex_5.html
-(add-hook 'TeX-mode-hook 'turn-on-reftex)
-
-(eval-after-load 'reftex-vars; Is this construct really needed?
-  '(progn
-     (setq reftex-cite-prompt-optional-args t); Prompt for empty optional arguments in cite macros.
-     ;; Make RefTeX interact with AUCTeX, http://www.gnu.org/s/auctex/manual/reftex/AUCTeX_002dRefTeX-Interface.html
-     (setq reftex-plug-into-AUCTeX t)
-     ;; So that RefTeX also recognizes \addbibresource. Note that you
-     ;; can't use $HOME in path for \addbibresource but that "~"
-     ;; works.
-     (setq reftex-bibliography-commands '("bibliography" "nobibliography" "addbibresource"))
-;     (setq reftex-default-bibliography '("UNCOMMENT LINE AND INSERT PATH TO YOUR BIBLIOGRAPHY HERE")); So that RefTeX in Org-mode knows bibliography
-     (setcdr (assoc 'caption reftex-default-context-regexps) "\\\\\\(rot\\|sub\\)?caption\\*?[[{]"); Recognize \subcaptions, e.g. reftex-citation
-     (setq reftex-cite-format; Get ReTeX with biblatex, see https://tex.stackexchange.com/questions/31966/setting-up-reftex-with-biblatex-citation-commands/31992#31992
-           '((?t . "\\textcite[]{%l}")
-             (?a . "\\autocite[]{%l}")
-             (?c . "\\cite[]{%l}")
-             (?s . "\\smartcite[]{%l}")
-             (?f . "\\footcite[]{%l}")
-             (?n . "\\nocite{%l}")
-             (?b . "\\blockcquote[]{%l}{}")))))
-
-;; Fontification (remove unnecessary entries as you notice them) http://lists.gnu.org/archive/html/emacs-orgmode/2009-05/msg00236.html http://www.gnu.org/software/auctex/manual/auctex/Fontification-of-macros.html
-(setq font-latex-match-reference-keywords
-      '(
-        ;; biblatex
-        ("printbibliography" "[{")
-        ("addbibresource" "[{")
-        ;; Standard commands
-        ;; ("cite" "[{")
-        ("Cite" "[{")
-        ("parencite" "[{")
-        ("Parencite" "[{")
-        ("footcite" "[{")
-        ("footcitetext" "[{")
-        ;; ;; Style-specific commands
-        ("textcite" "[{")
-        ("Textcite" "[{")
-        ("smartcite" "[{")
-        ("Smartcite" "[{")
-        ("cite*" "[{")
-        ("parencite*" "[{")
-        ("supercite" "[{")
-        ; Qualified citation lists
-        ("cites" "[{")
-        ("Cites" "[{")
-        ("parencites" "[{")
-        ("Parencites" "[{")
-        ("footcites" "[{")
-        ("footcitetexts" "[{")
-        ("smartcites" "[{")
-        ("Smartcites" "[{")
-        ("textcites" "[{")
-        ("Textcites" "[{")
-        ("supercites" "[{")
-        ;; Style-independent commands
-        ("autocite" "[{")
-        ("Autocite" "[{")
-        ("autocite*" "[{")
-        ("Autocite*" "[{")
-        ("autocites" "[{")
-        ("Autocites" "[{")
-        ;; Text commands
-        ("citeauthor" "[{")
-        ("Citeauthor" "[{")
-        ("citetitle" "[{")
-        ("citetitle*" "[{")
-        ("citeyear" "[{")
-        ("citedate" "[{")
-        ("citeurl" "[{")
-        ;; Special commands
-        ("fullcite" "[{")))
-
-(setq font-latex-match-textual-keywords
-      '(
-        ;; biblatex brackets
-        ("parentext" "{")
-        ("brackettext" "{")
-        ("hybridblockquote" "[{")
-        ;; Auxiliary Commands
-        ("textelp" "{")
-        ("textelp*" "{")
-        ("textins" "{")
-        ("textins*" "{")
-        ;; supcaption
-        ("subcaption" "[{")))
-
-(setq font-latex-match-variable-keywords
-      '(
-        ;; amsmath
-        ("numberwithin" "{")
-        ;; enumitem
-        ("setlist" "[{")
-        ("setlist*" "[{")
-        ("newlist" "{")
-        ("renewlist" "{")
-        ("setlistdepth" "{")
-        ("restartlist" "{")))
-
-
-;; Use pdf-tools to open PDF files
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-source-correlate-start-server t)
-
-;; Update PDF buffers after successful LaTeX runs
-(add-hook 'TeX-after-compilation-finished-functions
-           #'TeX-revert-document-buffer)
-
-(with-eval-after-load 'tex
-  (add-to-list 'safe-local-variable-values
-               '(TeX-command-extra-options . "-shell-escape")))
-
-
-(defun run-latex ()
-  (interactive)
-  (let ((process (TeX-active-process))) (if process (delete-process process)))
-  (let ((TeX-save-query nil)) (TeX-save-document ""))
-  (TeX-command-menu "LaTeX"))
-;; (add-hook 'LaTeX-mode-hook (lambda () (local-set-key (kbd "C-x C-s") #'run-latex)))
-
-(eval-after-load "tex"
-  '(progn
-     (add-to-list
-      'TeX-engine-alist
-      '(default-shell-escape "Default with shell escape"
-         "pdftex -shell-escape"
-         "pdflatex -shell-escape"
-         ConTeXt-engine))
-     ;; (setq-default TeX-engine 'default-shell-escape)
-     ))
-
-
-(require 'org-ref)
-(setq org-latex-prefer-user-labels t)
-(define-key org-mode-map (kbd "C-c i") 'org-ref-helm-insert-ref-link)
-(setq reftex-default-bibliography '("~/PHD/Notes/library.bib"))
-(setq org-ref-default-bibliography '("~/PHD/Notes/library.bib"))
-
-(defun display-latex-fragments-in-buffer ()
-  "This will properly display all fragments in org-mode >9"
-  (interactive)
-  (let ((current-prefix-arg '(16)))
-    (call-interactively 'org-preview-latex-fragment))
-  )
-
-
-;; Creates a new file for a diary entry into phd progress!
-(defun sharp/new-phd-diary ()
-  "This function can be used to create an org file with today as it's file name."
-  (interactive)
-  (find-file  (concat "~/PHD/Notes/" (format-time-string "phd-diaries/%Y/%m/%W.org" )))
-  (insert
-   (format
-    "#+TITLE: %s
-#+AUTHOR: Nathan Hughes
-#+INCLUDE: \"./preamble.org\" :minlevel 1
-
-* Tasks
-
- bibliography:../../../library.bib
- bibliographystyle:plainnat
- " "PhD Diary" ) ) )
-
-
-(defun sharp/find-phd-diary ()
-  (interactive)
-  (find-file  (concat "~/PHD/Notes/" (format-time-string "phd-diaries/%Y/%m/%W.org" ))))
-
-
-(defun friday-talks ()
-  "This function can be used to create an org file with today as it's file name."
-  (interactive)
-  (find-file  (concat "~/PHD/Notes/" (format-time-string "friday-seminar-%Y-%W.org" ))))
-
-(defun sharp/save-report ()
-  "Exports a tex version of the report document"
-  (interactive)
-  (setq sharp/last-buffer (current-buffer))
-  (find-file "~/PHD/Probation/report.org")
-  (org-latex-export-to-latex)
-  (switch-to-buffer sharp/last-buffer)
-  (shell-command "texcount report.tex | grep 'Words'"))
-
-(defun sharp/run-compile ()
-  "runs a nice commands to constantly build on change my report"
-  (interactive)
-  (async-shell-command "cd ~/PHD/Probation/; latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f report.tex --synctex=1 -pvc -view=none")
-  )
-
-(defun sharp/save-presentation ()
-  "Exports a tex version of the report document"
-  (interactive)
-  (org-beamer-export-to-latex)
-)
-
-(defun sharp/run-compile ()
-  "runs a nice commands to constantly build on change my report"
-  (interactive)
-  (async-shell-command "cd ~/PHD/Probation/; latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f report.tex --synctex=1 -pvc -view=none")
-  )
-
-(defun sharp/run-compile-presentation ()
-  "runs a nice commands to constantly build on change my report"
-  (interactive)
-  (async-shell-command "cd ~/PHD/Documents/Presentations/project_update_beamer/September; latexmk -pdflatex='lualatex -shell-escape -interaction nonstopmode' -pdf -f presentation.tex --synctex=1 -pvc -view=none")
-  )
-
-
-(require 'multiple-cursors)
-(global-set-key (kbd "C-.") 'mc/mark-next-like-this)
-(global-set-key (kbd "C->") 'mc/skip-to-next-like-this)
-(global-set-key (kbd "C-c m l") 'mc/edit-lines)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(define-key mc/keymap (kbd "<return>") nil)
-
-
-(set-face-attribute 'mode-line nil :box '(:color "#839496" :line-width 1))
-(set-face-attribute 'mode-line-inactive nil :box '(:color "#586e75" :line-width 1))
-(set-face-attribute 'powerline-active1 nil :box '(:color "#839496" :line-width 1))
-(set-face-attribute 'powerline-inactive1 nil :box '(:color "#586e75" :line-width 1))
-(set-face-attribute 'powerline-active2 nil :box '(:color "#839496" :line-width 1))
-(set-face-attribute 'powerline-inactive2 nil :box '(:color "#586e75" :line-width 1))
-
-
-
-(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
-
-
-
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -671,11 +330,9 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(custom-safe-themes
    (quote
-    ("672bb062b9c92e62d7c370897b131729c3f7fd8e8de71fc00d70c5081c80048c" "e6ccd0cc810aa6458391e95e4874942875252cd0342efd5a193de92bfbb6416b" "d261bb8f66be37752791a67f03dd24361592ce141b32d83bcbe63ec1c738b087" "6e32d7aab92ad2ad4d3a915cd9ace5dc1d9d8f0486b785bdb86c79ff5ca0c189" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" "7e1517d0e505a016b0f0d70266e1db601bf8226fe3a7454919b2a56b8dabe7cd" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
+    ("c1aac46c21cb76d1a6bb8a3d35258c2bfdcf80d0cbb3dc784b2588bf2f8a7591" "672bb062b9c92e62d7c370897b131729c3f7fd8e8de71fc00d70c5081c80048c" "e6ccd0cc810aa6458391e95e4874942875252cd0342efd5a193de92bfbb6416b" "d261bb8f66be37752791a67f03dd24361592ce141b32d83bcbe63ec1c738b087" "6e32d7aab92ad2ad4d3a915cd9ace5dc1d9d8f0486b785bdb86c79ff5ca0c189" "f3455b91943e9664af7998cc2c458cfc17e674b6443891f519266e5b3c51799d" "7e1517d0e505a016b0f0d70266e1db601bf8226fe3a7454919b2a56b8dabe7cd" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" default)))
  '(evil-want-Y-yank-to-eol nil)
  '(helm-ff-lynx-style-map t)
  '(org-agenda-files
@@ -683,13 +340,12 @@ you should place your code here."
     ("~/Google Drive/PHD/Documents/Summaries/PD_Models_ERC2020.org")))
  '(package-selected-packages
    (quote
-    (lispy elpy xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help leuven-theme yasnippet-snippets doom-nord-theme doom-themes ein doom-modeline swiper-helm swiper org-ref pdf-tools key-chord ivy helm-bibtex biblio parsebib biblio-core tablist multiple-cursors ace-jump-mode nord-theme zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme reveal-in-osx-finder rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme pbcopy osx-trash osx-dictionary organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme launchctl jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme exotica-theme espresso-theme dracula-theme django-theme darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mmm-mode markdown-toc markdown-mode magit-gitflow magit-popup htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck evil-magit magit git-commit with-editor transient diff-hl company-statistics company-anaconda company auto-yasnippet yasnippet auto-dictionary ac-ispell auto-complete yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state iedit evil-exchange evil-ediff evil-args evil-anzu anzu evil undo-tree adaptive-wrap ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+    (langtool latex-preview-pane company-auctex auctex kubernetes anaphora ess org-drill zoutline counsel skewer-mode polymode deferred websocket js2-mode simple-httpd lispy elpy xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help leuven-theme yasnippet-snippets doom-nord-theme doom-themes ein doom-modeline swiper-helm swiper org-ref pdf-tools key-chord ivy helm-bibtex biblio parsebib biblio-core tablist multiple-cursors ace-jump-mode nord-theme zenburn-theme zen-and-art-theme white-sand-theme underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme tao-theme tangotango-theme tango-plus-theme tango-2-theme sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme seti-theme reverse-theme reveal-in-osx-finder rebecca-theme railscasts-theme purple-haze-theme professional-theme planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme pbcopy osx-trash osx-dictionary organic-green-theme omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme naquadah-theme mustang-theme monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme lush-theme light-soap-theme launchctl jbeans-theme jazz-theme ir-black-theme inkpot-theme heroku-theme hemisu-theme hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme gandalf-theme flatui-theme flatland-theme farmhouse-theme exotica-theme espresso-theme dracula-theme django-theme darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized clues-theme cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme badwolf-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes afternoon-theme smeargle orgit org-projectile org-category-capture org-present org-pomodoro alert log4e gntp org-mime org-download mmm-mode markdown-toc markdown-mode magit-gitflow magit-popup htmlize helm-gitignore helm-company helm-c-yasnippet gnuplot gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gh-md fuzzy flyspell-correct-helm flyspell-correct flycheck-pos-tip pos-tip flycheck evil-magit magit git-commit with-editor transient diff-hl company-statistics company-anaconda company auto-yasnippet yasnippet auto-dictionary ac-ispell auto-complete yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic spinner evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-mc evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state iedit evil-exchange evil-ediff evil-args evil-anzu anzu evil undo-tree adaptive-wrap ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline smartparens restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile projectile pkg-info epl helm-mode-manager helm-make helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-unimpaired evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-escape goto-chg eval-sexp-fu elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((((class color) (min-colors 89)) (:foreground "#D8DEE9" :background "#2E3440"))))
  '(org-level-1 ((t (:inherit outline-1 :height 2.0))))
  '(org-level-2 ((t (:inherit outline-2 :height 1.5))))
  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
