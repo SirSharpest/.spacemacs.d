@@ -14,15 +14,11 @@
 
 
 (defun my-reftex-hook ()
-  (define-key reftex-mode-map "C-c [" nil)
   (define-key reftex-mode-map (kbd "C-c [") 'helm-bibtex-with-local-bibliography))
 
 
 (add-hook 'reftex-mode-hook 'my-reftex-hook)
 
-
-(with-eval-after-load 'tex-mode
-  (define-key tex-mode-map (kbd "C-c [") 'helm-bibtex-with-local-bibliography))
 
 
 (require 'multiple-cursors)
@@ -38,3 +34,8 @@
 (require 'expand-region)
 (global-set-key (kbd "C-=") 'er/expand-region)
 
+(eval-after-load "flyspell"
+  '(progn
+     (define-key flyspell-mode-map (kbd "C-.") nil)
+     (define-key flyspell-mode-map (kbd "C-,") nil)
+     ))
