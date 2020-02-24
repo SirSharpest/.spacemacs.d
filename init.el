@@ -31,7 +31,6 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     javascript
      python
      helm
      (auto-completion :variables
@@ -50,13 +49,14 @@ values."
      spell-checking
      syntax-checking
      version-control
-
+     javascript
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(ace-jump-mode
+                                      org-drill
                                       org-ref
                                       swiper-helm
                                       multiple-cursors

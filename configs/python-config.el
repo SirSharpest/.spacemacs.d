@@ -4,6 +4,14 @@
 (setq python-shell-interpreter "ipython"
       python-shell-interpreter-args "--simple-prompt -i")
 
+
+(defun my-python-mode-setup ()
+  (py-autopep8-enable-on-save)
+  )
+
+(add-hook 'python-mode-hook 'my-python-mode-setup)
+
+
 (setq-default flycheck-disabled-checkers '(python-flake8))
 (setq-default dotspacemacs-configuration-layers '(
                                                   (python :variables python-enable-yapf-format-on-save t)))
