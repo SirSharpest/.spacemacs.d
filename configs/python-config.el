@@ -5,11 +5,11 @@
       python-shell-interpreter-args "--simple-prompt -i")
 
 
-(defun my-python-mode-setup ()
-  (py-autopep8-enable-on-save)
-  )
+;; (defun my-python-mode-setup ()
+;;   (py-autopep8-enable-on-save)
+;;   )
 
-(add-hook 'python-mode-hook 'my-python-mode-setup)
+;; (add-hook 'python-mode-hook 'my-python-mode-setup)
 
 
 (setq-default flycheck-disabled-checkers '(python-flake8))

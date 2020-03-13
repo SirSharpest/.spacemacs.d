@@ -1,4 +1,11 @@
-(org-defkey org-mode-map [(meta return)] 'org-meta-return)
+
+;; (org-defkey org-mode-map [(meta return)] 'org-meta-return)
+
+
+(use-package org
+  :bind (:map spacemacs-org-mode-map-root-map ("M-RET" . nil)))
+
+
 (setq org-confirm-babel-evaluate nil)
 (setq org-latex-listings 'minted
       org-latex-packages-alist '(("" "minted"))
@@ -13,6 +20,7 @@
  '(org-level-3 ((t (:inherit outline-3 :height 1.2))))
  '(org-level-4 ((t (:inherit outline-4 :height 1.1))))
  '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
+
 
 
 
@@ -40,3 +48,5 @@
    (ipython . t)
    (plantuml .t)
    (latex . t)))
+
+(setq org-image-actual-width 400)
