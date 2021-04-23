@@ -33,11 +33,16 @@ values."
    '(
      yaml
      csv
-     python
+     (python :variables
+             python-format-on-save t
+             python-formatter 'yapf
+             python-backend 'lsp
+             python-sort-imports-on-save t)
      helm
      (auto-completion :variables
-                      auto-completion-enable-snippets-in-popup t)
-     ;; better-defaults
+                      auto-completion-enable-snippets-in-popup t
+                      auto-completion-enable-help-tooltip t
+                      auto-completion-enable-sort-by-usage t)
      latex
      osx
      themes-megapack
@@ -63,6 +68,7 @@ values."
                                       swiper-helm
                                       multiple-cursors
                                       yasnippet-snippets
+                                      dash-functional
                                       lispy
                                       langtool
                                       ein)
@@ -124,7 +130,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 15
+                               :size 12
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -222,7 +228,7 @@ values."
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
    ;; scrolling overrides the default behavior of Emacs which recenters point
    ;; when it reaches the top or bottom of the screen. (default t)
-   dotspacemacs-smooth-scrolling t
+   ;;dotspacemacs-smooth-scrolling t
    ;; Control line numbers activation.
    ;; If set to `t' or `relative' line numbers are turned on in all `prog-mode' and
    ;; `text-mode' derivatives. If set to `relative', line numbers are relative.
@@ -282,20 +288,15 @@ before packages are loaded. If you are unsure, you should try in setting them in
   (setq ispell-program-name "/usr/local/bin/aspell")
   (setq ispell-dictionary "en_GB")
   (add-to-list 'load-path "~/.spacemacs.d/scimax/ob-ipython-upstream/")
-  (add-to-list 'load-path "~/.spacemacs.d/scimax//")
+  (add-to-list 'load-path "~/.spacemacs.d/scimax/")
   )
 
-(add-hook 'company-mode-hook
-          (lambda ()
-            (substitute-key-definition
-             'company-complete-common
-             'company-yasnippet-or-completion
-             company-active-map)))
-
-
-
-
-
+;; (add-hook 'company-mode-hook
+;;           (lambda ()
+;;             (substitute-key-definition
+;;              'company-complete-common
+;;              'company-yasnippet-or-completion
+;;              company-active-map)))
 
 
 (defun dotspacemacs/user-config ()
@@ -307,9 +308,9 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
   (require 'ob-ipython)
-  (require 'scimax-ob)
   (require 'scimax-org-babel-ipython-upstream)
-
+  (toggle-scroll-bar -1)
+  (advice-remove 'mwheel-scroll #'spacemacs//scroll-bar-show-delayed-hide)
   (defun load-directory (dir)
     (let ((load-it (lambda (f)
                      (load-file (concat (file-name-as-directory dir) f)))
@@ -324,10 +325,7 @@ you should place your code here."
   (electric-pair-mode)
   (set-default 'truncate-lines nil)
   (global-prettify-symbols-mode 1)
-
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
-
-
   )
 
 ;; Do not write anything past this comment. This is where Emacs will

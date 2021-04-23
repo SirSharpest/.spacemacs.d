@@ -13,6 +13,11 @@
   (forward-line -1)
   (indent-according-to-mode))
 
+(defun my/disable-scroll-bars (frame)
+  (modify-frame-parameters frame
+                           '((vertical-scroll-bars . nil)
+                             (horizontal-scroll-bars . nil))))
+(add-hook 'after-make-frame-functions 'my/disable-scroll-bars)
 
 (defun company-yasnippet-or-completion ()
   "Solve company yasnippet conflicts."

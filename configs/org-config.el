@@ -5,6 +5,7 @@
 (use-package org
   :bind (:map spacemacs-org-mode-map-root-map ("M-RET" . nil)))
 
+(setq org-src-preserve-indentation t)
 
 (setq org-confirm-babel-evaluate nil)
 (setq org-latex-listings 'minted
@@ -22,10 +23,7 @@
  '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
 
 
-
-
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
-
 
 (require 'org-ref)
 (setq org-latex-prefer-user-labels t)

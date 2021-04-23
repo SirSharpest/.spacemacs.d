@@ -12,7 +12,6 @@
 (global-set-key [C-tab] 'ace-jump-word-mode)
 
 
-
 (defun my-reftex-hook ()
   (define-key reftex-mode-map (kbd "C-c [") 'helm-bibtex-with-local-bibliography))
 

@@ -1,9 +1,12 @@
 (setenv "WORKON_HOME" "~/anaconda3/envs")
 (pyvenv-workon "playground") ;; Default working env that has my libs
+(setq python-shell-completion-native-enable nil)
 
-(setq python-shell-interpreter "ipython"
-      python-shell-interpreter-args "--simple-prompt -i")
+;;(setq python-shell-interpreter "ipython"
+;;      python-shell-interpreter-args "--simple-prompt -i")
 
+;; (eval-after-load "company"
+;;   '(add-to-list 'company-backends 'company-anaconda))
 
 ;; (defun my-python-mode-setup ()
 ;;   (py-autopep8-enable-on-save)
@@ -11,10 +14,7 @@
 
 ;; (add-hook 'python-mode-hook 'my-python-mode-setup)
 
-
-(setq-default flycheck-disabled-checkers '(python-flake8))
-(setq-default dotspacemacs-configuration-layers '(
-                                                  (python :variables python-enable-yapf-format-on-save t)))
+;; (setq-default flycheck-disabled-checkers '(python-flake8))
 
 
 (add-hook
