@@ -3,6 +3,6 @@
 #key : py
 #contributor : Nathan Hughes
 # --
-#+BEGIN_SRC ipython :session
+#+BEGIN_SRC ipython 
   $0
 #+END_SRC

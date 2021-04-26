@@ -23,6 +23,14 @@
  '(org-level-5 ((t (:inherit outline-5 :height 1.0)))))
 
 
+
+(add-hook 'org-mode-hook
+          (lambda () (electric-indent-mode -1)))
+(add-hook 'org-mode-hook
+          (lambda () (electric-indent-local-mode -1)))
+
+(add-hook 'org-mode-hook 'org-in-src-block-p nil :local)
+
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)
 
 (require 'org-ref)
